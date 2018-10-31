@@ -1,9 +1,8 @@
-from ppo import *
+from bbr import *
 import matplotlib.pyplot as plt
 import seaborn as sns
-"""Need import yolo part"""
-# from yolo import *
-"""Need import yolo part"""
+
+"""Need import gym Enviroment part"""
 # import New_Pong
 
 EP_MAX = 1000
@@ -15,8 +14,7 @@ EP_LEN = 500
 S_DIM = env.observation_space.shape[0]
 A_DIM = env.action_space.n
 """initialize agents"""
-agent = PPONet(A_DIM,S_DIM)
-# zen = Yolo()
+agent = BBRNet(A_DIM,S_DIM)
 
 """H-parameters"""
 all_ep_r = []
@@ -30,13 +28,13 @@ for ep in range(EP_MAX):
     for t in range(EP_LEN):
         # env.render()
         """choose bounding box"""
-        box_frame = zen.look(s)
+        box_frame = agent.look(s)
         """
         greedy layer:
         n box_frames similar with initial box_frame.
         return: A list like [frame0, frame1, ...]
         """
-        frames = zen.greedy_layer(box_frame)
+        frames = agent.greedy_layer(box_frame)
         all_frames = [box_frame] + frames
         new_frames = [np.array([s,f]).transpose((1,2,0)) for f in all_frames]
         """select best one by state value"""
@@ -50,7 +48,7 @@ for ep in range(EP_MAX):
         loss = Critic(best) - Critic(selecteds)
         """
         loss = values[best_index] - values[0]
-        zen.store(s, box_frame, loss)
+        agent.store(s, box_frame, loss)
 
         """RL's Action"""
         a = agent.choose_action(best_s)

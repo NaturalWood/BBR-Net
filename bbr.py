@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from networks import *
 
-class PPONet(object):
+class BBRNet(object):
     def __init__(self,a_dim,
                     s_dim,
                     a_lr=1e-3,
@@ -38,7 +38,7 @@ class PPONet(object):
         a_indices = tf.stack([tf.range(tf.shape(self.tfa)[0], dtype=tf.int32), self.tfa], axis=1)
         pi_prob = tf.gather_nd(params=self.pi, indices=a_indices)   # shape=(None, )
         oldpi_prob = tf.gather_nd(params=self.oldpi, indices=a_indices)  # shape=(None, )
-        ratio = tf.exp(pi_prob - oldpi_prob)
+        ratio = (pi_prob / oldpi_prob)
         surr = ratio * self.tfadv                       # surrogate loss
 
         self.aloss = -tf.reduce_mean(tf.minimum(        # clipped surrogate objective
@@ -73,3 +73,12 @@ class PPONet(object):
     def get_v(self, s):
         if s.ndim < 2: s = s[np.newaxis, :]
         return self.sess.run(self.v, {self.tfs: s})[0, 0]
+
+    def look(self):
+        pass
+
+    def greedy_layer(self):
+        pass
+
+    def _build_yolo(self):
+        pass
